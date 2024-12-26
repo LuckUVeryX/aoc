@@ -26,7 +26,7 @@ func GetInput(day int) string {
 
 	sessionCookie := os.Getenv("SESSION")
 
-	url := fmt.Sprintf("https://adventofcode.com/2015/day/%d/input", day)
+	url := fmt.Sprintf("https://adventofcode.com/2019/day/%d/input", day)
 	req, _ := http.NewRequest("GET", url, nil)
 
 	req.AddCookie(&http.Cookie{
