@@ -5,6 +5,7 @@ type mode int
 const (
 	POS mode = iota
 	IMM
+	REL
 )
 
 type opcode int

@@ -5,32 +5,53 @@ import (
 )
 
 type computer struct {
-	pc  int
-	mem []int
-	in  <-chan int
-	out chan<- int
+	pc      int
+	relBase int
+	mem     map[int]int
+	in      <-chan int
+	out     chan<- int
 }
 
 func newComputer(mem []int, in <-chan int, out chan<- int) *computer {
-	return &computer{
-		pc:  0,
-		mem: mem,
-		in:  in,
-		out: out,
+	c := &computer{
+		pc:      0,
+		relBase: 0,
+		mem:     map[int]int{},
+		in:      in,
+		out:     out,
 	}
+	for i, v := range mem {
+		c.mem[i] = v
+	}
+	return c
+
 }
 
-func (c *computer) get(i int, instr instruction) int {
-	v := c.mem[c.pc+i]
-	mode := instr.modes[i-1]
-	switch mode {
+func (c *computer) get(addr int, md mode) int {
+	v := c.mem[addr]
+	switch md {
 	case POS:
 		return c.mem[v]
 	case IMM:
 		return v
+	case REL:
+		return c.mem[v+c.relBase]
+	default:
+		log.Fatalf("Unknown Mode: %d", md)
 	}
-	log.Fatalln("Invalid parameter mode", mode)
 	return -1
+}
+
+func (c *computer) set(addr, val int, md mode) {
+	v := c.mem[addr]
+	switch md {
+	case POS:
+		c.mem[v] = val
+	case REL:
+		c.mem[v+c.relBase] = val
+	default:
+		log.Fatalln("Bad mode for set", md)
+	}
 }
 
 func (c *computer) read() int {
